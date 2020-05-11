@@ -27,7 +27,8 @@ steps:
       helmVersionToInstall: 'latest'
 
   - script: |
-      echo "##vso[task.setvariable variable=version;]helm show chart $(Agent.BuildDirectory)/s/$(repo) | awk '/version:/ {print $2}'"
+      helmVersion=$(helm show chart $(Agent.BuildDirectory)/s/$(repo) | awk '/version:/ {print $2}')
+      echo "##vso[task.setvariable variable=version;]$helmVersion"
     displayName: Set version    
 
   - checkout: helmRepo
