@@ -1,3 +1,5 @@
+[![Build Status](https://dev.azure.com/johnwatson484/John%20D%20Watson/_apis/build/status/Helm%20Library?branchName=master)](https://dev.azure.com/johnwatson484/John%20D%20Watson/_build/latest?definitionId=37&branchName=master)
+
 # Helm Library
 Helm library chart
 
