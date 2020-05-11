@@ -1,0 +1,77 @@
+trigger:
+- master
+
+resources:
+  repositories:
+  - repository: helmRepo
+    type: github
+    endpoint: John D Watson
+    name: johnwatson484/helm-charts
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  repo: helm-library
+  helmRepo: helm-charts
+  helmRepositoryUrl: git@github.com:johnwatson484/helm-charts.git
+  version:
+
+steps: 
+  - checkout: self
+    displayName: Clone repository
+
+  - script: |
+      $helmVersion = helm show chart ./helm-library | awk '/version:/ {print $2}'
+      Write-Host "##vso[task.setvariable variable=version;]$helmVersion"
+    displayName: Set version    
+  
+  - task: HelmInstaller@1
+    displayName: Install Helm
+    inputs:
+      helmVersionToInstall: 'latest'
+
+  - checkout: helmRepo
+    displayName: Clone Helm repository
+
+  - script: |
+      helm package $(Agent.BuildDirectory)/s/$(repo)/$(repo) --destination $(Agent.BuildDirectory)/s/$(helmRepo)
+    displayName: Package Helm
+
+  - task: DownloadSecureFile@1
+    name: sshKey
+    displayName: Download SSH key
+    inputs:
+      secureFile: 'GitHub-Helm-Deploy-Key'
+
+  - script: |
+      mkdir ~/.ssh && mv $(sshKey.secureFilePath) ~/.ssh/id_rsa
+      chmod 700 ~/.ssh && chmod 600 ~/.ssh/id_rsa
+      ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
+    displayName: Install SSH key
+  
+  - script: |
+      cd $(Agent.BuildDirectory)/s/$(helmRepo)
+      helm repo index . --merge ./index.yaml
+      git config --global user.email "azuredevops@microsoft.com"
+      git config --global user.name "Azure DevOps"
+      git remote set-url --push origin $(helmRepositoryUrl)
+      git add .
+      git commit -m "$(repo) updated by Azure DevOps"
+      git push origin HEAD:master
+    displayName: Update Helm repo
+
+  - task: GitHubRelease@1
+    displayName: GitHub release
+    inputs:
+      gitHubConnection: 'John D Watson PAT'
+      repositoryName: '$(Build.Repository.Name)'
+      action: 'create'
+      target: '$(Build.SourceVersion)'
+      tagSource: 'userSpecifiedTag'
+      tag: '$(version)'
+      title: '$(version)'
+      releaseNotesSource: 'inline'
+      changeLogCompareToRelease: 'lastFullRelease'
+      changeLogType: 'commitBased'
+    continueOnError: true
