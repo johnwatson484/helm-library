@@ -22,7 +22,7 @@ steps:
     displayName: Clone repository
 
   - script: |
-      $helmVersion = helm show chart ./helm-library | awk '/version:/ {print $2}'
+      $helmVersion = helm show chart $(Agent.BuildDirectory)/s/$(repo) | awk '/version:/ {print $2}'
       Write-Host "##vso[task.setvariable variable=version;]$helmVersion"
     displayName: Set version    
   
