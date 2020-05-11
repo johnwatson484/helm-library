@@ -1,0 +1,18 @@
+{{- define "helm-library.postgres-service.tpl" -}}
+{{- $requiredMsg := include "helm-library.default-check-required-msg" . -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ required (printf $requiredMsg "postgresService.postgresHost") .Values.postgresService.postgresHost | quote }}
+  labels:
+    {{- include "helm-library.labels" . | nindent 4 }}
+spec:
+  type: ExternalName
+  externalName: {{ required (printf $requiredMsg "postgresService.postgresExternalName") .Values.postgresService.postgresExternalName | quote }}
+  ports:
+    - name: port
+      port: {{ required (printf $requiredMsg "postgresService.postgresPort") .Values.postgresService.postgresPort }}
+{{- end -}}
+{{- define "helm-library.postgres-service" -}}
+{{- include "helm-library.util.merge" (append . "helm-library.postgres-service.tpl") -}}
+{{- end -}}

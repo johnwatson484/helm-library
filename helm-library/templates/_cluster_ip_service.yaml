@@ -1,0 +1,20 @@
+{{- define "helm-library.cluster-ip-service.tpl" -}}
+{{- $requiredMsg := include "helm-library.default-check-required-msg" . -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ required (printf $requiredMsg "name") .Values.name | quote }}
+  labels:
+    {{- include "helm-library.labels" . | nindent 4 }}
+spec:
+  type: ClusterIP
+  ports:
+  - name: http
+    port: 80
+    targetPort: {{ required (printf $requiredMsg "container.port") .Values.container.port }}
+  selector:
+    {{- include "helm-library.selector-labels" . | nindent 4 }}
+{{- end -}}
+{{- define "helm-library.cluster-ip-service" -}}
+{{- include "helm-library.util.merge" (append . "helm-library.cluster-ip-service.tpl") -}}
+{{- end -}}
