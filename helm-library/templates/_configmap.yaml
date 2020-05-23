@@ -3,7 +3,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ required (printf $requiredMsg "configmap.name") .Values.configmap.name | quote }}
+  name: {{ required (printf $requiredMsg "configmap.name") .Values.name | quote }}
   labels:
     {{- include "helm-library.labels" . | nindent 4 }}
 data: {}
