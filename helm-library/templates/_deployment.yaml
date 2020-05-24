@@ -20,7 +20,6 @@ spec:
       annotations:
         redeployOnChange: {{ required (printf $requiredMsg "deployment.redeployOnChange") .Values.deployment.redeployOnChange | quote }}
     spec:
-      priorityClassName: {{ required (printf $requiredMsg "deployment.priorityClassName") .Values.deployment.priorityClassName | quote }}
       {{- if .Values.serviceAccount }}
       {{- if .Values.serviceAccount.roleArn }}
       serviceAccountName: {{ .Values.serviceAccount.name | quote }}
