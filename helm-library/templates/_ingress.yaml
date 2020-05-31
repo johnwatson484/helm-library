@@ -9,6 +9,13 @@ metadata:
   annotations:
     kubernetes.io/ingress.class: {{  required (printf $requiredMsg ".ingress.class") .Values.ingress.class | quote }}
 spec:
+  {{- if .Values.ingress.host }}
+  tls:
+  - hosts:
+    - {{ .Values.ingress.host }}
+    - www.{{ .Values.ingress.host }}
+    secretName: {{ .Values.name }}-tls
+  {{- end }}
   rules:
 {{- if .Values.ingress.host }}
   - host: {{ .Values.ingress.host }}
@@ -17,10 +24,19 @@ spec:
   - http:
 {{- end }}
       paths:
-      - path: /*
+      - path: /
         backend:
           serviceName: {{ required (printf $requiredMsg "name") .Values.name | quote }}
           servicePort: {{ required (printf $requiredMsg "service.port") .Values.service.port }}
+{{- if .Values.ingress.host }}
+  - host: www.{{ .Values.ingress.host }}
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: {{ required (printf $requiredMsg "name") .Values.name | quote }}
+          servicePort: {{ required (printf $requiredMsg "service.port") .Values.service.port }}
+{{- end }}
 {{- end }}
 {{- define "helm-library.ingress" -}}
 {{- include "helm-library.util.merge" (append . "helm-library.ingress.tpl") -}}
