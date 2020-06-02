@@ -271,6 +271,37 @@ service:
   type: <string>
 ```
 
+### Cron Job template
+
+* Template file: `_cron-job.yaml`
+* Template name: `helm-library.cron-job`
+
+A k8s `CronJob`.  
+
+A basic usage of this object template would involve the creation of `templates/cron-job.yaml` in the parent Helm chart (e.g. `microservice`) that includes the template defined in `_container.yaml` template:
+
+```
+{{- include "helm-library.cron-job" (list . "microservice.cron-job") -}}
+{{- define "microservice.cron-job" -}}
+spec:
+  template:
+    spec:
+      containers:
+      - {{ include "helm-library.container" (list . "microservice.container") }}
+{{- end -}}
+
+```
+
+#### Required values
+
+The following values need to be set in the parent chart's `values.yaml` in addition to the globally required values [listed above](#all-template-required-values):
+
+```
+cronJob:
+  schedule: <string>
+  concurrencyPolicy: <string>
+```
+
 ## Helper templates
 
 In addition to the K8s object templates described above, a number of helper templates are defined in `_helpers.tpl` that are both used within the library chart and available to use within a consuming parent chart.
