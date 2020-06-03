@@ -9,6 +9,7 @@ metadata:
 spec:
   schedule: {{ required (printf $requiredMsg "cronJob.schedule") .Values.cronJob.schedule | quote }}
   concurrencyPolicy: {{ required (printf $requiredMsg "cronJob.concurrencyPolicy") .Values.cronJob.concurrencyPolicy | quote }}
+  restartPolicy: {{ required (printf $requiredMsg "cronJob.restartPolicy") .Values.cronJob.restartPolicy | quote }}
   jobTemplate: 
     spec:
       template:

@@ -300,6 +300,7 @@ The following values need to be set in the parent chart's `values.yaml` in addit
 cronJob:
   schedule: <string>
   concurrencyPolicy: <string>
+  restartPolicy: <string>
 ```
 
 ## Helper templates
