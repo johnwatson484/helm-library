@@ -15,7 +15,7 @@ spec:
         spec:
           containers:
           -
-{{ include "helm-library.container.tpl" . | indent 10 }}
+{{ include "helm-library.container.tpl" . | indent 12 }}
 {{- end }}
 {{- define "helm-library.cron-job" -}}
 {{- include "helm-library.util.merge" (append . "helm-library.cron-job.tpl") -}}
