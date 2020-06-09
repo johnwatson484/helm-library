@@ -303,6 +303,46 @@ cronJob:
   restartPolicy: <string>
 ```
 
+### Horozontal Pod Autoscaler template
+
+* Template file: `_horozontal-pod-autoscaler.yaml`
+* Template name: `helm-library.horozontal-pod-autoscaler`
+
+A k8s `HorozontalPodAutoscaler`.  
+
+A basic usage of this object template would involve the creation of `templates/horozontal-pod-autoscaler.yaml` in the parent Helm chart (e.g. `microservice`).
+
+```
+{{- include "helm-library.horozontal-pod-autoscaler" (list . "microservice.horozontal-pod-autoscaler") -}}
+{{- define "microservice.horozontal-pod-autoscaler" -}}
+spec:
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 50
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: AverageValue
+        averageValue: 100Mi
+{{- end -}}
+
+```
+
+#### Required values
+
+The following values need to be set in the parent chart's `values.yaml` in addition to the globally required values [listed above](#all-template-required-values):
+
+```
+cronJob:
+  minReplicas: <int>
+  maxReplicas: <int>
+```
+
 ## Helper templates
 
 In addition to the K8s object templates described above, a number of helper templates are defined in `_helpers.tpl` that are both used within the library chart and available to use within a consuming parent chart.
