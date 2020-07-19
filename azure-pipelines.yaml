@@ -16,6 +16,7 @@ variables:
   helmRepo: helm-charts
   helmRepositoryUrl: git@github.com:johnwatson484/helm-charts.git
   version:
+  releaseExists: false
 
 steps: 
   - checkout: self
@@ -52,14 +53,23 @@ steps:
   
   - script: |
       cd $(Agent.BuildDirectory)/s/$(helmRepo)
-      helm repo index . --merge ./index.yaml
       git config --global user.email "azuredevops@microsoft.com"
       git config --global user.name "Azure DevOps"
       git remote set-url --push origin $(helmRepositoryUrl)
+      git pull origin master
+      helm repo index . --merge ./index.yaml
       git add .
       git commit -m "$(repo) updated by Azure DevOps"
       git push origin HEAD:master
     displayName: Update Helm repo
+
+  - task: PowerShell@2
+    displayName: Check GitHub release
+    inputs:
+      targetType: 'inline'
+      script: |
+        $releaseExists = (Invoke-RestMethod -SkipHttpErrorCheck -Uri 'https://api.github.com/repos/johnwatson484/$(repo)/releases/tags/$(version)').tag_name -eq '$(version)'
+        Write-Host "##vso[task.setvariable variable=releaseExists;]$releaseExists"
 
   - task: GitHubRelease@1
     displayName: GitHub release
@@ -75,3 +85,4 @@ steps:
       changeLogCompareToRelease: 'lastFullRelease'
       changeLogType: 'commitBased'
     continueOnError: true
+    condition: and(succeeded(), eq(variables.releaseExists, false))
