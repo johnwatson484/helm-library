@@ -53,11 +53,11 @@ steps:
   
   - script: |
       cd $(Agent.BuildDirectory)/s/$(helmRepo)
-      helm repo index . --merge ./index.yaml
       git config --global user.email "azuredevops@microsoft.com"
       git config --global user.name "Azure DevOps"
       git remote set-url --push origin $(helmRepositoryUrl)
       git pull origin master
+      helm repo index . --merge ./index.yaml
       git add .
       git commit -m "$(repo) updated by Azure DevOps"
       git push origin HEAD:master
