@@ -139,7 +139,6 @@ deployment:
   minReadySeconds: <integer>
   redeployOnChange: <string>
   priorityClassName: <string>
-  restartPolicy: <string>
   runAsUser: <integer>
   runAsNonRoot: <boolean>
 ```
