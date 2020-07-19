@@ -57,7 +57,7 @@ steps:
       git config --global user.email "azuredevops@microsoft.com"
       git config --global user.name "Azure DevOps"
       git remote set-url --push origin $(helmRepositoryUrl)
-      git pull
+      git pull origin master
       git add .
       git commit -m "$(repo) updated by Azure DevOps"
       git push origin HEAD:master
