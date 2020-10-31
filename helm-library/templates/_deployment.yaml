@@ -18,6 +18,7 @@ spec:
       labels:
         {{- include "helm-library.labels" . | nindent 8 }}
       annotations:
+        linkerd.io/inject: enabled
         redeployOnChange: {{ required (printf $requiredMsg "deployment.redeployOnChange") .Values.deployment.redeployOnChange | quote }}
     spec:
       {{- if .Values.serviceAccount }}
