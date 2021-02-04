@@ -302,18 +302,18 @@ cronJob:
   restartPolicy: <string>
 ```
 
-### Horozontal Pod Autoscaler template
+### Horizontal Pod Autoscaler template
 
-* Template file: `_horozontal-pod-autoscaler.yaml`
-* Template name: `helm-library.horozontal-pod-autoscaler`
+* Template file: `_horizontal-pod-autoscaler.yaml`
+* Template name: `helm-library.horizontal-pod-autoscaler`
 
-A k8s `HorozontalPodAutoscaler`.  
+A k8s `HorizontalPodAutoscaler`.  
 
-A basic usage of this object template would involve the creation of `templates/horozontal-pod-autoscaler.yaml` in the parent Helm chart (e.g. `microservice`).
+A basic usage of this object template would involve the creation of `templates/horizontal-pod-autoscaler.yaml` in the parent Helm chart (e.g. `microservice`).
 
 ```
-{{- include "helm-library.horozontal-pod-autoscaler" (list . "microservice.horozontal-pod-autoscaler") -}}
-{{- define "microservice.horozontal-pod-autoscaler" -}}
+{{- include "helm-library.horizontal-pod-autoscaler" (list . "microservice.horizontal-pod-autoscaler") -}}
+{{- define "microservice.horizontal-pod-autoscaler" -}}
 spec:
   metrics:
   - type: Resource
