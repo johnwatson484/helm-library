@@ -1,0 +1,14 @@
+{{- define "helm-library.azure-identity-binding.tpl" -}}
+{{- $requiredMsg := include "helm-library.default-check-required-msg" . -}}
+apiVersion: "aadpodidentity.k8s.io/v1"
+kind: AzureIdentityBinding
+metadata:
+  name: {{ required (printf $requiredMsg "name") .Values.name }}-identity-binding
+  labels: {{- include "helm-library.labels" . | nindent 4 }}
+spec:
+  azureIdentity: {{ required (printf $requiredMsg "name") .Values.name }}-identity
+  selector: {{ required (printf $requiredMsg "name") .Values.name }}-identity-selector
+{{- end -}}
+{{- define "helm-library.azure-identity-binding" -}}
+{{- include "helm-library.util.merge" (append . "helm-library.azure-identity-binding.tpl") -}}
+{{- end -}}
