@@ -16,6 +16,9 @@ spec:
   template:
     metadata:
       labels:
+        {{- if .Values.azureIdentity }}
+        aadpodidbinding: {{ required (printf $requiredMsg "name") .Values.name }}-identity-selector
+        {{- end }}
         {{- include "helm-library.labels" . | nindent 8 }}
       annotations:
         linkerd.io/inject: enabled
