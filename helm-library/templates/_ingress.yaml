@@ -30,6 +30,7 @@ spec:
 {{- end }}
       paths:
       - path: /
+        pathType: Prefix
         backend:
           service:
             name: {{ required (printf $requiredMsg "name") .Values.name | quote }}
@@ -40,6 +41,7 @@ spec:
     http:
       paths:
       - path: /
+        pathType: Prefix
         backend:
           service:
             name: {{ required (printf $requiredMsg "name") .Values.name | quote }}
