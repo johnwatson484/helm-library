@@ -31,16 +31,20 @@ spec:
       paths:
       - path: /
         backend:
-          serviceName: {{ required (printf $requiredMsg "name") .Values.name | quote }}
-          servicePort: {{ required (printf $requiredMsg "service.port") .Values.service.port }}
+          service:
+            name: {{ required (printf $requiredMsg "name") .Values.name | quote }}
+            port:
+              number: {{ required (printf $requiredMsg "service.port") .Values.service.port }}
 {{- if .Values.ingress.host }}
   - host: www.{{ .Values.ingress.host }}
     http:
       paths:
       - path: /
         backend:
-          serviceName: {{ required (printf $requiredMsg "name") .Values.name | quote }}
-          servicePort: {{ required (printf $requiredMsg "service.port") .Values.service.port }}
+          service:
+            name: {{ required (printf $requiredMsg "name") .Values.name | quote }}
+            port:
+              number: {{ required (printf $requiredMsg "service.port") .Values.service.port }}
 {{- end }}
 {{- end }}
 {{- define "helm-library.ingress" -}}
