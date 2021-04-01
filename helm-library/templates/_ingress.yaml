@@ -1,6 +1,6 @@
 {{- define "helm-library.ingress.tpl" -}}
 {{- $requiredMsg := include "helm-library.default-check-required-msg" . -}}
-apiVersion: networking.k8s.io/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: {{ required (printf $requiredMsg "name") .Values.name | quote }}
