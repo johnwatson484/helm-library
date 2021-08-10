@@ -12,8 +12,8 @@ args:
 {{- end }}
 imagePullPolicy: {{ required (printf $requiredMsg "container.imagePullPolicy") .Values.container.imagePullPolicy | quote }}
 securityContext:
-  readOnlyRootFilesystem: {{ required (printf $requiredMsg "container.readOnlyRootFilesystem") .Values.container.readOnlyRootFilesystem }}
-  allowPrivilegeEscalation: {{ required (printf $requiredMsg "container.allowPrivilegeEscalation") .Values.container.allowPrivilegeEscalation }}
+  readOnlyRootFilesystem: {{ .Values.container.readOnlyRootFilesystem | default true }}
+  allowPrivilegeEscalation: {{ .Values.container.allowPrivilegeEscalation | default false }}
 resources:
   requests:
     memory: {{ required (printf $requiredMsg "container.requestMemory") .Values.container.requestMemory | quote }}
@@ -21,6 +21,9 @@ resources:
   limits:
     memory: {{ required (printf $requiredMsg "container.limitMemory") .Values.container.limitMemory | quote }}
     cpu: {{ required (printf $requiredMsg "container.limitCpu") .Values.container.limitCpu | quote }}
+volumeMounts:
+- mountPath: /tmp
+  name: temp-dir
 {{- end -}}
 {{- define "helm-library.container" -}}
 {{- println "" -}}

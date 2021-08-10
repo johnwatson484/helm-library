@@ -34,9 +34,12 @@ spec:
       - name: {{ required (printf $requiredMsg "deployment.imagePullSecret") .Values.deployment.imagePullSecret| quote }}
       {{- end }}
       securityContext:
-        fsGroup: {{ required (printf $requiredMsg "deployment.runAsUser") .Values.deployment.runAsUser }}
-        runAsUser: {{ required (printf $requiredMsg "deployment.runAsUser") .Values.deployment.runAsUser }}
-        runAsNonRoot: {{ required (printf $requiredMsg "deployment.runAsNonRoot") .Values.deployment.runAsNonRoot }}
+        fsGroup: {{ .Values.deployment.runAsUser | default 1000 }}
+        runAsUser: {{ .Values.deployment.runAsUser | default 1000 }}
+        runAsNonRoot: {{ .Values.deployment.runAsNonRoot | default true }}
+      volumes:
+      - name: temp-dir
+        emptyDir: {}
       containers:
       -
 {{ include "helm-library.container.tpl" . | indent 8 }}
