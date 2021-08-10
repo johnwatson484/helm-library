@@ -28,7 +28,7 @@ spec:
       {{- if .Values.serviceAccount.roleArn }}
       serviceAccountName: {{ .Values.serviceAccount.name | quote }}
       {{- end }}
-      {{- end }}      
+      {{- end }}
       {{- if .Values.deployment.imagePullSecret }}
       imagePullSecrets:
       - name: {{ required (printf $requiredMsg "deployment.imagePullSecret") .Values.deployment.imagePullSecret| quote }}
