@@ -15,9 +15,9 @@ spec:
         spec:
           restartPolicy: {{ required (printf $requiredMsg "cronJob.restartPolicy") .Values.cronJob.restartPolicy | quote }}
           securityContext:
-            fsGroup: {{ .Values.deployment.runAsUser | default 1000 }}
-            runAsUser: {{ .Values.deployment.runAsUser | default 1000 }}
-            runAsNonRoot: {{ .Values.deployment.runAsNonRoot | default true }}
+            fsGroup: {{ .Values.cronJob.runAsUser | default 1000 }}
+            runAsUser: {{ .Values.cronJob.runAsUser | default 1000 }}
+            runAsNonRoot: {{ .Values.cronJob.runAsNonRoot | default true }}
           volumes:
           - name: temp-dir
             emptyDir: {}
