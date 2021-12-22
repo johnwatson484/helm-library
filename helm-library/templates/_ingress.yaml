@@ -12,7 +12,7 @@ metadata:
     nginx.ingress.kubernetes.io/configuration-snippet: |
       proxy_set_header l5d-dst-override $service_name.$namespace.svc.cluster.local:$service_port;
       grpc_set_header l5d-dst-override $service_name.$namespace.svc.cluster.local:$service_port;
-    nginx.ingress.kubernetes.io/limit-rps: {{ .Values.ingress.limitRps | default 10 }}
+    nginx.ingress.kubernetes.io/limit-rps: {{ .Values.ingress.limitRps | default 10 | quote }}
     {{- end }}
 spec:
   {{- if .Values.ingress.host }}
