@@ -183,11 +183,12 @@ service:
 
 #### Optional values
 
-The following values can optionally be set in the parent chart's `values.yaml` to set the value of `host`:
+The following values can optionally be set in the parent chart's `values.yaml` to set the value of `host` or limit requests per second to mitigate DDoS attacks:
 
 ```
 ingress:
   host: <string>
+  limitRps: <integer> (default: 10)
 ```
 
 ### Postgres service template
