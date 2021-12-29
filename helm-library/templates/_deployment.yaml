@@ -7,8 +7,8 @@ metadata:
   labels:
     {{- include "helm-library.labels" . | nindent 4 }}
 spec:
-  replicas: {{ .Values.deployment.replicas | default 1 }}
-  minReadySeconds: {{ .Values.deployment.minReadySeconds | default 0 }}
+  replicas: {{ required (printf $requiredMsg "deployment.replicas") .Values.deployment.replicas }}
+  minReadySeconds: {{ required (printf $requiredMsg "deployment.minReadySeconds") .Values.deployment.minReadySeconds }}
   strategy: {}
   selector:
     matchLabels:
