@@ -1,6 +1,6 @@
 {{- define "helm-library.cron-job.tpl" -}}
 {{- $requiredMsg := include "helm-library.default-check-required-msg" . -}}
-apiVersion: batch/v1beta1
+apiVersion: batch/v1
 kind: CronJob
 metadata:
   name: {{ required (printf $requiredMsg "name") .Values.name | quote }}
