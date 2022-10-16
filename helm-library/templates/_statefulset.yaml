@@ -1,4 +1,4 @@
-{{- define "helm-library.stateful-set.tpl" -}}
+{{- define "helm-library.statefulset.tpl" -}}
 {{- $requiredMsg := include "helm-library.default-check-required-msg" . -}}
 apiVersion: apps/v1
 kind: StatefulSet
@@ -43,6 +43,6 @@ spec:
       -
 {{ include "helm-library.container.tpl" . | indent 8 }}
 {{- end }}
-{{- define "helm-library.stateful-set" -}}
-{{- include "helm-library.util.merge" (append . "helm-library.stateful-set.tpl") -}}
+{{- define "helm-library.statefulset" -}}
+{{- include "helm-library.util.merge" (append . "helm-library.statefulset.tpl") -}}
 {{- end -}}

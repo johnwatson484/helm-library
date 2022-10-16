@@ -154,15 +154,15 @@ deployment:
 
 ### StatefulSet template
 
-* Template file: `_stateful-set.yaml`
-* Template name: `helm-library.stateful-set`
+* Template file: `_statefulset.yaml`
+* Template name: `helm-library.statefulset`
 
 A K8s `StatefulSet` object.
 
-A basic usage of this object template would involve the creation of `templates/stateful-set.yaml` in the parent Helm chart (e.g. `microservice`) that includes the template defined in `_container.yaml` template:
+A basic usage of this object template would involve the creation of `templates/statefulset.yaml` in the parent Helm chart (e.g. `microservice`) that includes the template defined in `_container.yaml` template:
 
 ```
-{{- include "helm-library.stateful-set" (list . "microservice.deployment") -}}
+{{- include "helm-library.statefulset" (list . "microservice.deployment") -}}
 {{- define "microservice.deployment" -}}
 spec:
   template:
