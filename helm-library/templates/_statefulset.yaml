@@ -9,6 +9,7 @@ metadata:
 spec:
   podManagementPolicy: Parallel
   replicas: {{ required (printf $requiredMsg "deployment.replicas") .Values.deployment.replicas }}
+  serviceName: {{ .Values.name }}
   selector:
     matchLabels:
       {{- include "helm-library.selector-labels" . | nindent 6 }}
