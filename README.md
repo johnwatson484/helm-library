@@ -152,6 +152,36 @@ deployment:
   imagePullSecret: <string>
 ```
 
+### StatefulSet template
+
+* Template file: `_stateful-set.yaml`
+* Template name: `helm-library.stateful-set`
+
+A K8s `StatefulSet` object.
+
+A basic usage of this object template would involve the creation of `templates/stateful-set.yaml` in the parent Helm chart (e.g. `microservice`) that includes the template defined in `_container.yaml` template:
+
+```
+{{- include "helm-library.stateful-set" (list . "microservice.deployment") -}}
+{{- define "microservice.deployment" -}}
+spec:
+  template:
+    spec:
+      containers:
+      - {{ include "helm-library.container" (list . "microservice.container") }}
+{{- end -}}
+
+```
+
+#### Required values
+
+The following values need to be set in the parent chart's `values.yaml` in addition to the globally required values [listed above](#all-template-required-values):
+
+```
+deployment:
+  replicas: <integer>
+```
+
 ### Ingress template
 
 * Template file: `_ingress.yaml`
