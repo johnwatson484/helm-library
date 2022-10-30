@@ -8,7 +8,7 @@ metadata:
     {{- include "helm-library.labels" . | nindent 4 }}
   annotations:
     kubernetes.io/ingress.class: {{ .Values.ingress.class | default "nginx" | quote }}
-    {{- if eq .Values.ingress.class "nginx" }}
+    {{- if eq (.Values.ingress.class | default "nginx") "nginx" }}
     nginx.ingress.kubernetes.io/configuration-snippet: |
       proxy_set_header l5d-dst-override $service_name.$namespace.svc.cluster.local:$service_port;
       grpc_set_header l5d-dst-override $service_name.$namespace.svc.cluster.local:$service_port;
