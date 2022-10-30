@@ -50,7 +50,7 @@ spec:
           service:
             name: {{ required (printf $requiredMsg "name") .Values.name | quote }}
             port:
-              number: {{ required (printf $requiredMsg "service.port") .Values.service.port }}
+              number: 80
 {{- end }}
 {{- end }}
 {{- define "helm-library.ingress" -}}
