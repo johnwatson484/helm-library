@@ -14,7 +14,6 @@ app.kubernetes.io/name: {{ required (printf $requiredMsg "name") .Values.name | 
 app.kubernetes.io/instance: {{ .Release.Name }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
-environment: {{ required (printf $requiredMsg "environment") .Values.environment | quote }}
 {{- end -}}
 
 {{/*

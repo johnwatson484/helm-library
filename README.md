@@ -35,7 +35,6 @@ All the K8s object templates in the library require the following values to be s
 
 ```
 name: <string>
-environment: <string>
 ```
 
 ### Cluster IP service template
