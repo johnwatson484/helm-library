@@ -88,9 +88,6 @@ The following values need to be set in the parent chart's `values.yaml` in addit
 ```
 image: <string>
 container:
-  imagePullPolicy: <string>
-  readOnlyRootFilesystem: <boolean>
-  allowPrivilegeEscalation: <boolean>
   requestMemory: <string>
   requestCpu: <string>
   limitMemory: <string>
@@ -128,20 +125,6 @@ spec:
 
 ```
 
-#### Required values
-
-The following values need to be set in the parent chart's `values.yaml` in addition to the globally required values [listed above](#all-template-required-values):
-
-```
-deployment:
-  replicas: <integer>
-  minReadySeconds: <integer>
-  redeployOnChange: <string>
-  priorityClassName: <string>
-  runAsUser: <integer>
-  runAsNonRoot: <boolean>
-```
-
 #### Optional values
 
 The following value can optionally be set in the parent chart's `values.yaml` to enable the configuration of imagePullSecrets in the K8s object:
@@ -170,15 +153,6 @@ spec:
       - {{ include "helm-library.container" (list . "microservice.container") }}
 {{- end -}}
 
-```
-
-#### Required values
-
-The following values need to be set in the parent chart's `values.yaml` in addition to the globally required values [listed above](#all-template-required-values):
-
-```
-deployment:
-  replicas: <integer>
 ```
 
 ### Ingress template
@@ -328,7 +302,6 @@ The following values need to be set in the parent chart's `values.yaml` in addit
 cronJob:
   schedule: <string>
   concurrencyPolicy: <string>
-  restartPolicy: <string>
 ```
 
 ### Horizontal Pod Autoscaler template

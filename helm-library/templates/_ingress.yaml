@@ -7,12 +7,15 @@ metadata:
   labels:
     {{- include "helm-library.labels" . | nindent 4 }}
   annotations:
-    kubernetes.io/ingress.class: {{  required (printf $requiredMsg ".ingress.class") .Values.ingress.class | quote }}
+    kubernetes.io/ingress.class: {{ .Values.ingress.class | default "nginx" | quote }}
     {{- if eq .Values.ingress.class "nginx" }}
     nginx.ingress.kubernetes.io/configuration-snippet: |
       proxy_set_header l5d-dst-override $service_name.$namespace.svc.cluster.local:$service_port;
       grpc_set_header l5d-dst-override $service_name.$namespace.svc.cluster.local:$service_port;
     nginx.ingress.kubernetes.io/limit-rps: "10"
+    {{- end }}
+    {{- if .Values.ingress.host }}
+    cert-manager.io/cluster-issuer: {{ .Values.ingress.certIssuer | default "letsencrypt" | quote }}
     {{- end }}
 spec:
   {{- if .Values.ingress.host }}

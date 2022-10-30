@@ -8,7 +8,7 @@ metadata:
     {{- include "helm-library.labels" . | nindent 4 }}
 spec:
   podManagementPolicy: Parallel
-  replicas: {{ required (printf $requiredMsg "deployment.replicas") .Values.deployment.replicas }}
+  replicas: {{ .Values.deployment.replicas | default 1 }}
   serviceName: {{ .Values.name }}
   selector:
     matchLabels:
