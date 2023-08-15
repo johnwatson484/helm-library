@@ -1,6 +1,6 @@
 {{- define "helm-library.horizontal-pod-autoscaler.tpl" -}}
 {{- $requiredMsg := include "helm-library.default-check-required-msg" . -}}
-apiVersion: autoscaling/v2beta2
+apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
   name: {{ required (printf $requiredMsg "name") .Values.name | quote }}
