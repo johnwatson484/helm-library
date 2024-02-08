@@ -1,16 +1,36 @@
 {{- define "helm-library.horizontal-pod-autoscaler.tpl" -}}
 {{- $requiredMsg := include "helm-library.default-check-required-msg" . -}}
+{{- $deploymentName := (coalesce .Values.nameOverride .Values.name) -}}
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: {{ required (printf $requiredMsg "name") .Values.name | quote }}
+  name: {{ required (printf $requiredMsg "name") (coalesce .Values.autoscaling.name .Values.name) | quote }}
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: {{ required (printf $requiredMsg "name") .Values.name | quote }}
-  minReplicas: {{ required (printf $requiredMsg "minReplicas") .Values.deployment.minReplicas }}
-  maxReplicas: {{ required (printf $requiredMsg "maxReplicas") .Values.deployment.maxReplicas }}
+    name: {{ required (printf $requiredMsg "name") $deploymentName | quote }}
+  minReplicas: {{ required (printf $requiredMsg "minReplicas") .Values.autoscaling.minReplicas }}
+  maxReplicas: {{ required (printf $requiredMsg "maxReplicas") .Values.autoscaling.maxReplicas }}
+  {{- if or (ne .Values.autoscaling.targetCPUUtilizationPercentage nil) (ne .Values.autoscaling.targetMemoryUtilizationPercentage nil) }}
+  metrics:
+    {{- if (ne .Values.autoscaling.targetCPUUtilizationPercentage nil) }}
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.autoscaling.targetCPUUtilizationPercentage }}
+    {{- end }}
+    {{- if (ne .Values.autoscaling.targetMemoryUtilizationPercentage nil) }}
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.autoscaling.targetMemoryUtilizationPercentage }}
+    {{- end }}
+  {{- end }}
 {{- end }}
 {{- define "helm-library.horizontal-pod-autoscaler" -}}
 {{- include "helm-library.util.merge" (append . "helm-library.horizontal-pod-autoscaler.tpl") -}}

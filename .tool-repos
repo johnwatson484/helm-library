@@ -1,0 +1,3 @@
+kubeconform https://github.com/lirlia/asdf-kubeconform.git
+kubectl https://github.com/asdf-community/asdf-kubectl.git
+helm https://github.com/Antiarchitect/asdf-helm.git

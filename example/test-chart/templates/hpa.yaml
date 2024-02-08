@@ -1,0 +1,6 @@
+{{- if .Values.autoscaling.enabled }}
+{{- include "helm-library.horizontal-pod-autoscaler" (list . "chart.horizontal-pod-autoscaler") -}}
+{{- end }}
+{{- define "chart.horizontal-pod-autoscaler" -}}
+# custom horizontal-pod-autoscaler configs here
+{{- end -}}

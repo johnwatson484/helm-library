@@ -1,57 +1,53 @@
 {{- define "helm-library.ingress.tpl" -}}
 {{- $requiredMsg := include "helm-library.default-check-required-msg" . -}}
+{{- $svcPort := (coalesce (first .Values.service.ports).port .Values.service.port) -}}
+{{- $fullName := (coalesce (first .Values.service.ports).name .Values.service.name) -}}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: {{ required (printf $requiredMsg "name") .Values.name | quote }}
   labels:
     {{- include "helm-library.labels" . | nindent 4 }}
+  {{- with .Values.ingress.annotations }}
   annotations:
-    kubernetes.io/ingress.class: {{ .Values.ingress.class | default "nginx" | quote }}
-    {{- if eq (.Values.ingress.class | default "nginx") "nginx" }}
-    nginx.ingress.kubernetes.io/configuration-snippet: |
-      proxy_set_header l5d-dst-override $service_name.$namespace.svc.cluster.local:$service_port;
-      grpc_set_header l5d-dst-override $service_name.$namespace.svc.cluster.local:$service_port;
-    nginx.ingress.kubernetes.io/limit-rps: "10"
-    {{- end }}
-    {{- if .Values.ingress.host }}
-    cert-manager.io/cluster-issuer: {{ .Values.ingress.certIssuer | default "letsencrypt" | quote }}
-    {{- end }}
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 spec:
-  {{- if .Values.ingress.host }}
+  {{- if .Values.ingress.className }}
+  ingressClassName: {{ .Values.ingress.className }}
+  {{- end }}
+  {{- if .Values.ingress.tls }}
   tls:
-  - hosts:
-    - {{ .Values.ingress.host }}
-    - www.{{ .Values.ingress.host }}
-    secretName: {{ .Values.name }}-tls
+    {{- range .Values.ingress.tls }}
+    - hosts:
+        {{- range .hosts }}
+        - {{ . | quote }}
+        {{- end }}
+      secretName: {{ .secretName }}
+    {{- end }}
   {{- end }}
   rules:
-{{- if .Values.ingress.host }}
-  - host: {{ .Values.ingress.host }}
-    http:
-{{ else }}
-  - http:
-{{- end }}
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: {{ required (printf $requiredMsg "name") .Values.name | quote }}
-            port:
-              number: 80
-{{- if .Values.ingress.host }}
-  - host: www.{{ .Values.ingress.host }}
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: {{ required (printf $requiredMsg "name") .Values.name | quote }}
-            port:
-              number: 80
-{{- end }}
+    {{- range .Values.ingress.hosts }}
+    - host: {{ .host | quote }}
+      http:
+        paths:
+          {{- range .paths }}
+          - path: {{ .path }}
+            {{- if .pathType }}
+            pathType: {{ .pathType }}
+            {{- end }}
+            backend:
+              {{- if semverCompare ">=1.19-0" $.Capabilities.KubeVersion.GitVersion }}
+              service:
+                name: {{ $fullName }}
+                port:
+                  number: {{ $svcPort }}
+              {{- else }}
+              serviceName: {{ $fullName }}
+              servicePort: {{ $svcPort }}
+              {{- end }}
+          {{- end }}
+    {{- end }}
 {{- end }}
 {{- define "helm-library.ingress" -}}
 {{- include "helm-library.util.merge" (append . "helm-library.ingress.tpl") -}}

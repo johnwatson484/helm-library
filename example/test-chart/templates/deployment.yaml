@@ -1,0 +1,6 @@
+{{- if and (ne .Values.deployment nil) (ne .Values.container nil) }}
+{{- include "helm-library.deployment" (list . "chart.deployment") -}}
+{{- end }}
+{{- define "chart.deployment" -}}
+# custom deployment configs here
+{{- end -}}

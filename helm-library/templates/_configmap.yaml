@@ -6,7 +6,10 @@ metadata:
   name: {{ required (printf $requiredMsg "configmap.name") .Values.name | quote }}
   labels:
     {{- include "helm-library.labels" . | nindent 4 }}
-data: {}
+data:
+{{- with .Values.configMap.data -}}
+{{ toYaml . | nindent 2 }}
+{{- end }}
 {{- end }}
 {{- define "helm-library.configmap" -}}
 {{- include "helm-library.util.merge" (append . "helm-library.configmap.tpl") -}}

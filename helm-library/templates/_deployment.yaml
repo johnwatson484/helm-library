@@ -3,11 +3,13 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ required (printf $requiredMsg "name") .Values.name | quote }}
+  name: {{ required (printf $requiredMsg "name") (coalesce .Values.nameOverride .Values.name ) | quote }}
   labels:
     {{- include "helm-library.labels" . | nindent 4 }}
 spec:
-  replicas: {{ .Values.deployment.replicas | default 1 }}
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
   minReadySeconds: {{ .Values.deployment.minReadySeconds | default 0 }}
   strategy: {}
   selector:
@@ -20,26 +22,45 @@ spec:
         aadpodidbinding: {{ required (printf $requiredMsg "name") .Values.name }}-identity-selector
         {{- end }}
         {{- include "helm-library.labels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
       annotations:
+        {{- if .Values.deployment.injectLinkerd }}
         linkerd.io/inject: enabled
+        {{- end }}
         redeployOnChange: {{ randAlphaNum 5 | quote }}
+        {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
     spec:
       {{- if .Values.serviceAccount }}
       {{- if .Values.serviceAccount.roleArn }}
       serviceAccountName: {{ .Values.serviceAccount.name | quote }}
       {{- end }}
       {{- end }}
-      {{- if .Values.deployment.imagePullSecret }}
+      {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
-      - name: {{ required (printf $requiredMsg "deployment.imagePullSecret") .Values.deployment.imagePullSecret| quote }}
+        {{- toYaml . | nindent 8 }}
       {{- end }}
       securityContext:
-        fsGroup: {{ .Values.deployment.runAsUser | default 1000 }}
-        runAsUser: {{ .Values.deployment.runAsUser | default 1000 }}
-        runAsNonRoot: {{ .Values.deployment.runAsNonRoot | default true }}
+        {{- toYaml .Values.deployment.podSecurityContext | nindent 8 }}
+      {{- with .Values.deployment.volumes }}
       volumes:
-      - name: temp-dir
-        emptyDir: {}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.deployment.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.deployment.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.deployment.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       containers:
       -
 {{ include "helm-library.container.tpl" . | indent 8 }}

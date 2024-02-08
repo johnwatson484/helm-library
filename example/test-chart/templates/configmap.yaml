@@ -1,0 +1,7 @@
+{{- if (ne .Values.configMap nil) }}
+{{- include "helm-library.configmap" (list . "chart.configmap") -}}
+{{- end }}
+{{- define "chart.configmap" }}
+## custom configmap stuff here
+{{- end }}
+

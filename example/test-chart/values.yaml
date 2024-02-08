@@ -1,0 +1,99 @@
+# Default values for test-chart.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+name: test-chart
+
+nameOverride: ""
+fullnameOverride: ""
+
+configMap:
+  name: ""
+  data:
+    test: "test"
+    anotherTest: "anotherTest"
+    aFile: |
+      [config]
+      inifile=1
+      crashmode=0
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+podLabels: {}
+
+deployment:
+  minReadySeconds: 0
+  replicaCount: 1
+  injectLinkerd: true
+  imagePullSecret: ""
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+  podSecurityContext: {}
+    # fsGroup: 2000
+  volumes: []
+# - name: foo
+#   secret:
+#     secretName: mysecret
+#     optional: false
+container:
+  command: ""
+  args: ""
+  image: "hello-world"
+  name: "test-deployment"
+  pullPolicy: IfNotPresent
+  securityContext: #{}
+    readOnlyRootFilesystem: true
+    runAsNonRoot: true
+    allowPrivilegeEscalation: false
+  resources: #{}
+    limits:
+      cpu: 100m
+      memory: 128Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+  volumeMounts: []
+  # - name: foo
+  #   mountPath: "/etc/foo"
+  #   readOnly: true
+
+service:
+  type: ClusterIP
+  # port: 80
+  name: test-chart-service
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+autoscaling:
+  enabled: true
+  name: "test-chart-hpa"
+  minReplicas: 1
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: 80

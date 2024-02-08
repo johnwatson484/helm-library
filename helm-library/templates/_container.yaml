@@ -1,7 +1,7 @@
 {{- define "helm-library.container.tpl" -}}
 {{- $requiredMsg := include "helm-library.default-check-required-msg" . -}}
-name: {{ required (printf $requiredMsg "name") .Values.name | quote }}
-image: {{ required (printf $requiredMsg "image") .Values.image | quote }}
+name: {{ required (printf $requiredMsg "name") (coalesce .Values.container.name .Values.name) | quote }}
+image: {{ required (printf $requiredMsg "image") .Values.container.image | quote }}
 {{- if .Values.container.command }}
 command:
   {{- toYaml .Values.container.command | nindent 12 }}
@@ -12,18 +12,17 @@ args:
 {{- end }}
 imagePullPolicy: {{ .Values.container.imagePullPolicy | default "Always" | quote }}
 securityContext:
-  readOnlyRootFilesystem: {{ .Values.container.readOnlyRootFilesystem | default true }}
-  allowPrivilegeEscalation: {{ .Values.container.allowPrivilegeEscalation | default false }}
+  {{- with .Values.container.securityContext }}
+  {{ toYaml . | nindent 2 }}
+  {{- end }}
 resources:
-  requests:
-    memory: {{ required (printf $requiredMsg "container.requestMemory") .Values.container.requestMemory | quote }}
-    cpu: {{ required (printf $requiredMsg "container.requestCpu") .Values.container.requestCpu | quote }}
-  limits:
-    memory: {{ required (printf $requiredMsg "container.limitMemory") .Values.container.limitMemory | quote }}
-    cpu: {{ required (printf $requiredMsg "container.limitCpu") .Values.container.limitCpu | quote }}
+  {{- with .Values.container.resources }}
+  {{ toYaml . | nindent 2 }}
+  {{- end }}
+{{- with .Values.container.volumeMounts }}
 volumeMounts:
-- mountPath: /tmp
-  name: temp-dir
+  {{- toYaml . | nindent 12 }}
+{{- end }}
 {{- end -}}
 {{- define "helm-library.container" -}}
 {{- println "" -}}
