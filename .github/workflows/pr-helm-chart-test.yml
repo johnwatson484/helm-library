@@ -3,6 +3,13 @@ on:
   pull_request:
     branches:
       - main
+  workflow_dispatch:
+    inputs:
+      kubeapi_version:
+        description: "Kubernetes API version"
+        required: true
+        default: "1.26.5"
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -16,15 +23,15 @@ jobs:
 
       - name: Install ASDF
         uses: asdf-vm/actions/setup@v3
+
       - name: Install ASDF plugins
         run: |
           if [ -f .tool-repos ]; then
             cat .tool-repos | while read tool || [[ -n $tool ]]; do
-              echo "this line: $tool"
-              echo "asdf plugin add $(echo $tool | cut -d ' ' -f 1) $(echo $tool | cut -d ' ' -f 2)"
               asdf plugin add $(echo $tool | cut -d ' ' -f 1) $(echo $tool | cut -d ' ' -f 2)
             done
           fi  
+
       - name: Install ASDF tools
         run: |
           if [ -f .tool-versions ]; then
@@ -49,7 +56,6 @@ jobs:
       - name: Validate Helm Chart
         working-directory: example/test-chart
         run: |
-          KUBEVERSION="1.26.5"
-          helm template . | kubeconform -strict -summary -kubernetes-version $KUBEVERSION -exit-on-error
+          helm template . | kubeconform -strict -summary -kubernetes-version '${{ github.event.inputs.kubeapi_version }}' -exit-on-error
 
 
