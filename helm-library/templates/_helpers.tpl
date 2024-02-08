@@ -5,6 +5,16 @@ A default message string to be used when checking for a required value
 {{- "No value found for '%s' in helm-library template" -}}
 {{- end -}}
 
+{{- /*
+helm-library.listEnvVars.v1 takes a list of key-value pairs and outputs a environment variable list suitable to be included in a pod definition.
+*/}}
+{{- define "helm-library.listEnvVars" -}}
+{{- range $key, $val := . }}
+- name: {{ $key }}
+  value: {{ $val }}
+{{- end -}}
+{{- end -}}
+
 {{/*
 Common labels
 */}}

@@ -25,6 +25,7 @@ kubeconform -strict -summary -kubernetes-version $KUBEVERSION -exit-on-error $OU
 if [ $? -eq 0 ]; then
   echo "Manifest file is valid"
   if [ -f $OUTFILE ]; then
+    cat $OUTFILE
     rm -f $OUTFILE
     rmdir $(dirname $OUTFILE)
   fi

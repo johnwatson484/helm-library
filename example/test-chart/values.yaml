@@ -15,7 +15,6 @@ configMap:
       [config]
       inifile=1
       crashmode=0
-
 serviceAccount:
   # Specifies whether a service account should be created
   create: true
@@ -24,10 +23,8 @@ serviceAccount:
   # The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
   name: ""
-
 podAnnotations: {}
 podLabels: {}
-
 deployment:
   minReadySeconds: 0
   replicaCount: 1
@@ -38,17 +35,22 @@ deployment:
   affinity: {}
   podSecurityContext: {}
     # fsGroup: 2000
-  volumes: []
-# - name: foo
-#   secret:
-#     secretName: mysecret
-#     optional: false
+  volumes: 
+  - name: configmap-test
+    configMap:
+      name: test-chart
+      items:
+        - key: aFile
+          path: foo
 container:
   command: ""
   args: ""
   image: "hello-world"
   name: "test-deployment"
   pullPolicy: IfNotPresent
+  env: 
+    TEST_ENV: "test"
+    TEST_ENV2: "test2"
   securityContext: #{}
     readOnlyRootFilesystem: true
     runAsNonRoot: true
@@ -60,10 +62,10 @@ container:
     requests:
       cpu: 100m
       memory: 128Mi
-  volumeMounts: []
-  # - name: foo
-  #   mountPath: "/etc/foo"
-  #   readOnly: true
+  volumeMounts: 
+    - name: configmap-test
+      mountPath: "/etc/foo"
+      readOnly: true
 
 service:
   type: ClusterIP

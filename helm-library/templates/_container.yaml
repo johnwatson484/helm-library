@@ -11,13 +11,17 @@ args:
   {{- toYaml .Values.container.args | nindent 12 }}
 {{- end }}
 imagePullPolicy: {{ .Values.container.imagePullPolicy | default "Always" | quote }}
+{{- if (ne .Values.container.env nil) }}
+env:
+  {{- include "helm-library.listEnvVars" .Values.container.env | nindent 12 }}
+{{- end }}
 securityContext:
   {{- with .Values.container.securityContext }}
-  {{ toYaml . | nindent 2 }}
+  {{ toYaml . | nindent 12 }}
   {{- end }}
 resources:
   {{- with .Values.container.resources }}
-  {{ toYaml . | nindent 2 }}
+  {{ toYaml . | nindent 12 }}
   {{- end }}
 {{- with .Values.container.volumeMounts }}
 volumeMounts:
