@@ -64,7 +64,7 @@ jobs:
           KUBEAPI_VERSION=${WF_KUBEAPI_VERSION:-"1.26.5"}
           helm template . | kubeconform -strict -summary -kubernetes-version $KUBEAPI_VERSION -exit-on-error
   deploy:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && github.workflow.steps.test.outcome == 'success'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' 
     needs: test
     environment:
       name: github-pages
