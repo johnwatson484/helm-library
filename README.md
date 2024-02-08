@@ -1,4 +1,4 @@
-![Build Status](https://github.com/bvaughan-nexient/helm-library/actions/workflows/release-helm-chart.yml/badge.svg?branch=main)
+[![Helm Chart Test and Release](https://github.com/bvaughan-nexient/helm-library/actions/workflows/unified-workflow.yml/badge.svg)](https://github.com/bvaughan-nexient/helm-library/actions/workflows/unified-workflow.yml)
 
 # Helm Library
 
