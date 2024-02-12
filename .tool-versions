@@ -1,3 +1,4 @@
 kubeconform 0.6.4
 kubectl 1.28.5
 helm 3.13.0
+jq 1.7.1

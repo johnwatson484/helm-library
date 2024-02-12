@@ -8,7 +8,7 @@ metadata:
     {{- include "helm-library.labels" . | nindent 4 }}
 spec:
   {{- if not .Values.autoscaling.enabled }}
-  replicas: {{ .Values.replicaCount }}
+  replicas: {{ .Values.deployment.replicaCount }}
   {{- end }}
   minReadySeconds: {{ .Values.deployment.minReadySeconds | default 0 }}
   strategy: {}
@@ -39,12 +39,12 @@ spec:
       serviceAccountName: {{ .Values.serviceAccount.name | quote }}
       {{- end }}
       {{- end }}
-      {{- with .Values.imagePullSecrets }}
+      {{- with .Values.deployment.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       securityContext:
-        {{- toYaml .Values.deployment.podSecurityContext | nindent 8 }}
+        {{- toYaml .Values.deployment.podSecurityContext | default "{}" | nindent 8 }}
       {{- with .Values.deployment.volumes }}
       volumes:
         {{- toYaml . | nindent 8 }}

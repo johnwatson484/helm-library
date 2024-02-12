@@ -26,8 +26,8 @@ serviceAccount:
 podAnnotations: {}
 podLabels: {}
 deployment:
-  kind: StatefulSet # Deployment, StatefulSet
-  # kind: Deployment # Deployment, StatefulSet
+  # kind: StatefulSet # Deployment, StatefulSet
+  kind: Deployment # Deployment, StatefulSet
   minReadySeconds: 0
   replicaCount: 1
   injectLinkerd: true

@@ -1,4 +1,4 @@
-{{- if and (ne .Values.deployment nil) (ne .Values.container nil) }}
+{{- if and (ne .Values.deployment nil) (ne .Values.container nil) (eq .Values.deployment.kind "Deployment")}}
 {{- include "helm-library.deployment" (list . "chart.deployment") -}}
 {{- end }}
 {{- define "chart.deployment" -}}

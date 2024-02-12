@@ -1,11 +1,16 @@
 #!/usr/bin/env bash
 
 # This is a simple test script to test the functionality of the helm chart
-OUTFILE=$(mktemp -d --tmpdir=.)/test-manifest.yaml
+OUTDIR=$(mktemp -d --tmpdir=.)
+OUTFILE=${OUTDIR}/test-manifest.yaml
 KUBEVERSION="1.26.5"
 
+if [ -f Chart.lock ]; then
+  rm -f Chart.lock
+fi
+
 helm dependencies update
-helm template . > $OUTFILE
+helm template . --output-dir $OUTDIR --debug
 if [ $? -eq 0 ]; then
   echo "Helm chart is able to generate the manifest files successfully"
 else
@@ -21,14 +26,12 @@ else
   exit 1
 fi
 
-kubeconform -strict -summary -kubernetes-version $KUBEVERSION -exit-on-error $OUTFILE
+kubeconform -strict -summary -kubernetes-version $KUBEVERSION -exit-on-error $OUTDIR
 if [ $? -eq 0 ]; then
   echo "Manifest file is valid"
-  if [ -f $OUTFILE ]; then
-    cat $OUTFILE
-    rm -f $OUTFILE
-    rmdir $(dirname $OUTFILE)
-  fi
+  for file in $(find ${OUTDIR} -type f -name "*.yaml"); do
+    echo $file; echo; echo; cat $file; echo; echo;
+  done
 else
   echo "Manifest file is invalid"
   exit 1

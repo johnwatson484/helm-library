@@ -1,0 +1,81 @@
+name: Helm Chart Test workflow
+on:
+  workflow_call:
+    inputs:
+      value_file:
+        description: 'The value file to use for the helm chart'
+        required: true
+        type: string
+      test_path:
+        description: 'The path to the test directory'
+        required: true
+        type: string
+      kube_api_version:
+        description: 'The kubernetes api version to use for kubeconform'
+        required: false
+        default: "1.26.5"
+        type: string
+jobs:
+  reusable_helm_test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Install ASDF
+        uses: asdf-vm/actions/setup@v3
+
+      - name: Install ASDF plugins
+        run: |
+          if [ -f .tool-repos ]; then
+            cat .tool-repos | while read tool || [[ -n $tool ]]; do
+              asdf plugin add $(echo $tool | cut -d ' ' -f 1) $(echo $tool | cut -d ' ' -f 2)
+            done
+          fi  
+
+      - name: Install ASDF tools
+        run: |
+          if [ -f .tool-versions ]; then
+            asdf install
+          fi
+
+      - name: Install Helm Chart dependencies
+        working-directory: ${{ github.event.inputs.test_path }}
+        run: |
+          resolve-helm-chart-dependencies () {
+            if [ -z $1 ]; then
+              echo "No chart directory provided"
+              startdir=$(pwd)
+            else
+              startdir=$1
+            fi
+            pushd $startdir
+            helm dep build .
+            if [ -d ./charts ]; then
+              for chartzip in `find charts -maxdepth 1 -name '*.tgz' -type f`; do
+                chartzipdir=$(tar -tzf $chartzip | head -n 1 | cut -f 1 -d '/')
+                tar xfvz $chartzip -C charts
+                echo; echo; echo "Resolving dependencies for $chartzipdir"; echo; echo
+                resolve-helm-chart-dependencies charts/$chartzipdir
+              done
+            else 
+              echo; echo; echo "${startdir}: No dependencies found."; echo; echo
+            fi
+            popd
+          }  
+          resolve-helm-chart-dependencies .
+
+      - name: Lint Helm Chart
+        working-directory: ${{ github.event.inputs.test_path }}
+        run: |
+          helm lint .  --values ${{ github.event.inputs.value_file }}
+        
+      - name: Build Helm Template
+        working-directory: ${{ github.event.inputs.test_path }}
+        run: |
+          mkdir -p output
+          helm template . --values ${{ github.event.inputs.value_file }} --output-dir ./output
+
+      - name: Validate Helm Chart
+        working-directory: ${{ github.event.inputs.test_path }}
+        run: |
+          helm template . --values ${{ github.event.inputs.value_file }} | kubeconform -strict -summary -kubernetes-version ${{ github.event.inputs.kube_api_version }} -exit-on-error

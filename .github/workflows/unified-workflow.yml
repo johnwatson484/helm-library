@@ -14,9 +14,11 @@ on:
         default: "1.26.5"
 
 jobs:
-  test:
+  enumerate_tests:
     ## Always run tests.
     runs-on: ubuntu-latest
+    outputs:
+      valfiles: ${{ steps.find-values.outputs.valfilesJson }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -25,44 +27,67 @@ jobs:
           ref: ${{github.event.pull_request.head.ref}}
           repository: ${{github.event.pull_request.head.repo.full_name}}
 
-      - name: Install ASDF
-        uses: asdf-vm/actions/setup@v3
-
-      - name: Install ASDF plugins
-        run: |
-          if [ -f .tool-repos ]; then
-            cat .tool-repos | while read tool || [[ -n $tool ]]; do
-              asdf plugin add $(echo $tool | cut -d ' ' -f 1) $(echo $tool | cut -d ' ' -f 2)
-            done
-          fi  
-
-      - name: Install ASDF tools
-        run: |
-          if [ -f .tool-versions ]; then
-            asdf install
-          fi
-
-      - name: Install Helm Chart dependencies
+      - name: Find Values Files
+        id: find-values
         working-directory: example/test-chart
         run: |
-          helm dependencies update
+          valfiles=$(find . -type f -name "values*.yaml" -o -name "values*.yml")
+          valfilesJson=$(jq --compact-output --null-input '$ARGS.positional' --args -- "${valfiles[@]}")          )
+          echo $valfilesJson >> $GITHUB_OUTPUT
+        shell: bash
 
-      - name: Build Helm Template
-        working-directory: example/test-chart
-        run: |
-          helm template . 
+  test:
+    runs-on: ubuntu-latest
+    needs: [enumerate_tests]
+    strategy:
+      matrix:
+        values_file: ${{ needs.enumerate_tests.outputs.valfiles }}
+    steps:
+      - name: Run test jobs
+        uses: ./helm-test.yml
+        with:
+          value_file: ${{ matrix.values_file }}
+          test_path: example/test-chart
+          kubeapi_version: "1.26.5"
 
-      - name: Lint Helm Chart
-        working-directory: example/test-chart
-        run: |
-          helm template . | helm lint
+      # - name: Install ASDF
+      #   uses: asdf-vm/actions/setup@v3
 
-      - name: Validate Helm Chart
-        working-directory: example/test-chart
-        run: |
-          WF_KUBEAPI_VERSION=${{ github.event.inputs.kubeapi_version }}
-          KUBEAPI_VERSION=${WF_KUBEAPI_VERSION:-"1.26.5"}
-          helm template . | kubeconform -strict -summary -kubernetes-version $KUBEAPI_VERSION -exit-on-error
+      # - name: Install ASDF plugins
+      #   run: |
+      #     if [ -f .tool-repos ]; then
+      #       cat .tool-repos | while read tool || [[ -n $tool ]]; do
+      #         asdf plugin add $(echo $tool | cut -d ' ' -f 1) $(echo $tool | cut -d ' ' -f 2)
+      #       done
+      #     fi  
+
+      # - name: Install ASDF tools
+      #   run: |
+      #     if [ -f .tool-versions ]; then
+      #       asdf install
+      #     fi
+
+      # - name: Install Helm Chart dependencies
+      #   working-directory: example/test-chart
+      #   run: |
+      #     helm dependencies update
+
+      # - name: Build Helm Template
+      #   working-directory: example/test-chart
+      #   run: |
+      #     helm template . --values values.yaml
+
+      # - name: Lint Helm Chart
+      #   working-directory: example/test-chart
+      #   run: |
+      #     helm template . --values values.yaml | helm lint
+
+      # - name: Validate Helm Chart
+      #   working-directory: example/test-chart
+      #   run: |
+      #     WF_KUBEAPI_VERSION=${{ github.event.inputs.kubeapi_version }}
+      #     KUBEAPI_VERSION=${WF_KUBEAPI_VERSION:-"1.26.5"}
+      #     helm template . --values values.yaml | kubeconform -strict -summary -kubernetes-version $KUBEAPI_VERSION -exit-on-error
   deploy:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main' 
     needs: test
