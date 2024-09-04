@@ -6,6 +6,8 @@ metadata:
   name: {{ required (printf $requiredMsg "name") .Values.name | quote }}
   labels:
     {{- include "helm-library.labels" . | nindent 4 }}
+  annotations:
+    secrets.infisical.com/auto-reload: "true"
 spec:
   replicas: {{ .Values.deployment.replicas | default 1 }}
   minReadySeconds: {{ .Values.deployment.minReadySeconds | default 0 }}
@@ -22,7 +24,6 @@ spec:
         {{- include "helm-library.labels" . | nindent 8 }}
       annotations:
         linkerd.io/inject: enabled
-        secrets.infisical.com/auto-reload: "true"
         redeployOnChange: {{ randAlphaNum 5 | quote }}
     spec:
       {{- if .Values.serviceAccount }}
