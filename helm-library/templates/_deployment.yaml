@@ -22,6 +22,7 @@ spec:
         {{- include "helm-library.labels" . | nindent 8 }}
       annotations:
         linkerd.io/inject: enabled
+        secrets.infisical.com/auto-reload: "true"
         redeployOnChange: {{ randAlphaNum 5 | quote }}
     spec:
       {{- if .Values.serviceAccount }}
