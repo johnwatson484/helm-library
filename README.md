@@ -441,3 +441,22 @@ A basic usage of this object template would involve the creation of `templates/a
 #### Required values
 
 Only the globally required values [listed above](#all-template-required-values).
+
+### Infiscal secret
+
+* Template file: `_infiscal-secret.yaml`
+* Template name: `helm-library.infiscal-secret`
+
+A K8s `InfiscalSecret` object.
+
+A basic usage of this object template would involve the creation of `templates/azure-identity-binding.yaml` in the parent Helm chart (e.g. `microservice`) containing:
+
+```
+{{- include "helm-library.infiscal-secret" (list . "microservice.infiscal-secret") -}}
+{{- define "microservice.infiscal-secret" -}}
+{{- end -}}
+```
+
+#### Required values
+
+Only the globally required values [listed above](#all-template-required-values).
