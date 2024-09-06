@@ -20,7 +20,7 @@ resources:
     cpu: {{ required (printf $requiredMsg "container.requestCpu") .Values.container.requestCpu | quote }}
   limits:
     memory: {{ required (printf $requiredMsg "container.limitMemory") .Values.container.limitMemory | quote }}
-    cpu: {{ required (printf $requiredMsg "container.limitCpu") .Values.container.limitCpu | quote }}
+    cpu: {{ .Values.container.limitCpu | quote }}
 volumeMounts:
 - mountPath: /tmp
   name: temp-dir

@@ -91,7 +91,6 @@ container:
   requestMemory: <string>
   requestCpu: <string>
   limitMemory: <string>
-  limitCpu: <string>
 ```
 
 #### Optional values
@@ -102,6 +101,7 @@ The following values can optionally be set in the parent chart's `values.yaml` t
 container:
   command: <list of strings>
   args: <list of strings>
+  limitCpu: <string>
 ```
 
 ### Deployment template
