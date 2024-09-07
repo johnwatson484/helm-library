@@ -15,6 +15,31 @@ securityContext:
   readOnlyRootFilesystem: {{ .Values.container.readOnlyRootFilesystem | default true }}
   allowPrivilegeEscalation: {{ .Values.container.allowPrivilegeEscalation | default false }}
 resources:
+  {{- if eq .Values.container.resourceTier "S" }}
+  requests:
+    memory: "100Mi"
+    cpu: "100m"
+  limits:
+    memory: "100Mi"
+  {{- else if eq .Values.container.resourceTier "M" }}
+  requests:
+    memory: "250Mi"
+    cpu: "250m"
+  limits:
+    memory: "250Mi"
+  {{- else if eq .Values.container.resourceTier "L" }}
+  requests:
+    memory: "500Mi"
+    cpu: "500m"
+  limits:
+    memory: "500Mi"
+  {{- else if eq .Values.container.resourceTier "XL" }}
+  requests:
+    memory: "1Gi"
+    cpu: "1"
+  limits:
+    memory: "1Gi"
+  {{- else }}
   requests:
     memory: {{ required (printf $requiredMsg "container.requestMemory") .Values.container.requestMemory | quote }}
     cpu: {{ required (printf $requiredMsg "container.requestCpu") .Values.container.requestCpu | quote }}
@@ -23,6 +48,7 @@ resources:
     {{- if .Values.container.limitCpu }}
     cpu: {{ .Values.container.limitCpu | quote }}
     {{- end }}
+  {{- end }}
 volumeMounts:
 - mountPath: /tmp
   name: temp-dir
