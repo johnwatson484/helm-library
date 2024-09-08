@@ -1,5 +1,4 @@
 {{- define "helm-library.keda-scaled-object.tpl" -}}
-{{- $requiredMsg := include "helm-library.default-check-required-msg" . -}}
 apiVersion: keda.sh/v1alpha1
 kind: ScaledObject
 metadata:
