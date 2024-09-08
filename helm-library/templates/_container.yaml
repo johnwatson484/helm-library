@@ -1,7 +1,7 @@
 {{- define "helm-library.container.tpl" -}}
 {{- $requiredMsg := include "helm-library.default-check-required-msg" . -}}
 name: {{ .Chart.Name | quote }}
-image: {{ .Chart.Name | quote }}
+image: {{ .Values.container.image | default .Chart.Name | quote }}
 envFrom:
 {{- if .Values.configMap }}
 - configMapRef:
