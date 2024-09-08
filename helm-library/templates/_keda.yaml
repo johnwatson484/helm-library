@@ -1,0 +1,17 @@
+{{- define "helm-library.keda-scaled-object.tpl" -}}
+{{- $requiredMsg := include "helm-library.default-check-required-msg" . -}}
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: {{ .Chart.Name }}
+spec:
+  scaleTargetRef:
+    name: {{ .Chart.Name }}
+  minReplicaCount: {{ .Values.deployment.minReplicas | default 1 }}
+  maxReplicaCount: {{ .Values.deployment.maxReplicas | default 100 }}
+  triggers:
+  -
+{{- end }}
+{{- define "helm-library.keda-scaled-object" -}}
+{{- include "helm-library.util.merge" (append . "helm-library.keda-scaled-object.tpl") -}}
+{{- end -}}
