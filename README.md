@@ -10,7 +10,7 @@ In your microservice Helm chart:
   * Add the library chart under `dependencies` and choose the version you want (example below). Version number can include `~` or `^` to pick up latest PATCH and MINOR versions respectively.
   * Issue the following commands to add the repo that contains the library chart, update the repo, then update dependencies in your Helm chart:
 
-```
+```yaml
 helm repo add https://helm.lynxmagnus.com
 helm repo update
 helm dependency update <helm_chart_location>
@@ -18,23 +18,15 @@ helm dependency update <helm_chart_location>
 
 An example `Chart.yaml`:
 
-```
+```yaml
 apiVersion: v2
 description: A Helm chart
 name: microservice
 version: 1.0.0
 dependencies:
 - name: helm-library
-  version: ^1.0.0
+  version: 1.0.0
   repository: https://helm.lynxmagnus.com
-```
-
-### All template required values
-
-All the K8s object templates in the library require the following values to be set in the parent microservice Helm chart's `values.yaml`:
-
-```
-name: <string>
 ```
 
 ### Cluster IP service template
@@ -46,7 +38,7 @@ A K8s `Service` object of type `ClusterIP`.
 
 A basic usage of this object template would involve the creation of `templates/cluster-ip-service.yaml` in the parent Helm chart (e.g. `microservice`) containing:
 
-```
+```yaml
 {{- include "helm-library.cluster-ip-service" (list . "microservice.service") -}}
 {{- define "microservice.service" -}}
 # Microservice specific configuration in here
@@ -55,9 +47,9 @@ A basic usage of this object template would involve the creation of `templates/c
 
 #### Required values
 
-The following values need to be set in the parent chart's `values.yaml` in addition to the globally required values [listed above](#all-template-required-values):
+The following values need to be set in the parent chart's `values.yaml`:
 
-```
+```yaml
 container:
   port: <integer>
 ```
@@ -71,7 +63,7 @@ A template for the container definition to be used within a K8s `Deployment` obj
 
 A basic usage of this object template would involve the creation of `templates/_container.yaml` in the parent Helm chart (e.g. `microservice`). Note the `_` in the name. This template is part of the `Deployment` object definition and will be used in conjunction the `_deployment.yaml` template ([see below](#deployment-template)). As a minimum `templates/_container.yaml` would define environment variables and may also include liveness/readiness probes when applicable e.g.:
 
-```
+```yaml
 {{- define "microservice.container" -}}
 env: <list>
 livenessProbe: <map>
@@ -83,10 +75,9 @@ The liveness and readiness probes could take advantage of the helper templates f
 
 #### Required values
 
-The following values need to be set in the parent chart's `values.yaml` in addition to the globally required values [listed above](#all-template-required-values):
+The following values need to be set in the parent chart's `values.yaml`:
 
-```
-image: <string>
+```yaml
 container:
   requestMemory: <string>
   requestCpu: <string>
@@ -97,11 +88,11 @@ container:
 
 The following values can optionally be set in the parent chart's `values.yaml` to enable a command with arguments to run within the container:
 
-```
+```yaml
 container:
   command: <list of strings>
   args: <list of strings>
-  limitCpu: <string>
+  resourceTier: <char> # S, M, L, XL - used in place of requestMemory, requestCpu, limitMemory
 ```
 
 ### Deployment template
@@ -113,14 +104,9 @@ A K8s `Deployment` object.
 
 A basic usage of this object template would involve the creation of `templates/deployment.yaml` in the parent Helm chart (e.g. `microservice`) that includes the template defined in `_container.yaml` template:
 
-```
+```yaml
 {{- include "helm-library.deployment" (list . "microservice.deployment") -}}
 {{- define "microservice.deployment" -}}
-spec:
-  template:
-    spec:
-      containers:
-      - {{ include "helm-library.container" (list . "microservice.container") }}
 {{- end -}}
 
 ```
@@ -143,16 +129,10 @@ A K8s `StatefulSet` object.
 
 A basic usage of this object template would involve the creation of `templates/statefulset.yaml` in the parent Helm chart (e.g. `microservice`) that includes the template defined in `_container.yaml` template:
 
-```
+```yaml
 {{- include "helm-library.statefulset" (list . "microservice.deployment") -}}
 {{- define "microservice.deployment" -}}
-spec:
-  template:
-    spec:
-      containers:
-      - {{ include "helm-library.container" (list . "microservice.container") }}
 {{- end -}}
-
 ```
 
 ### Ingress template
@@ -164,31 +144,19 @@ A K8s `Ingress` object that can be configured for Nginx or AWS ALB (Amazon Load 
 
 A basic Nginx `Ingress` object would involve the creation of `templates/ingress.yaml` in the parent Helm chart (e.g. `microservice`) containing:
 
-```
+```yaml
 {{- include "helm-library.ingress" (list . "microservice.ingress") -}}
 {{- define "microservice.ingress" -}}
-metadata:
-  annotations:
-    <map_of_nginx-ingress-annotations>
 {{- end -}}
 ```
 
 #### Required values
 
-The following values need to be set in the parent chart's `values.yaml` in addition to the globally required values [listed above](#all-template-required-values):
-
-```
-ingress:
-  class: <string>
-service:
-  port: <integer>
-```
-
 #### Optional values
 
 The following values can optionally be set in the parent chart's `values.yaml` to set the value of `host`:
 
-```
+```yaml
 ingress:
   host: <string>
 ```
@@ -202,7 +170,7 @@ A K8s `Service` object of type `ExternalName` configured to refer to a Postgres 
 
 A basic usage of this object template would involve the creation of `templates/postgres-service.yaml` in the parent Helm chart (e.g. `microservice`) containing:
 
-```
+```yaml
 {{- include "helm-library.postgres-service" (list . "microservice.postgres-service") -}}
 {{- define "microservice.postgres-service" -}}
 # Microservice specific configuration in here
@@ -211,13 +179,13 @@ A basic usage of this object template would involve the creation of `templates/p
 
 #### Required values
 
-The following values need to be set in the parent chart's `values.yaml` in addition to the globally required values [listed above](#all-template-required-values):
+The following values need to be set in the parent chart's `values.yaml`:
 
-```
-postgresService:
-  postgresHost: <string>
-  postgresExternalName: <string>
-  postgresPort: <integer>
+```yaml
+postgres:
+  host: <string>
+  externalName: <string>
+  port: <integer>
 ```
 
 ### Secret template
@@ -229,23 +197,13 @@ A K8s `Secret` object to host sensitive data such as a password or token.
 
 A basic usage of this object template would involve the creation of `templates/secret.yaml` in the parent Helm chart (e.g. `microservice`), which should include the `data` map containing the sensitive data :
 
-```
+```yaml
 {{- include "helm-library.secret" (list . "microservice.secret") -}}
 {{- define "microservice.secret" -}}
-data:
+stringData:
   <key1>: <value1>
   ...
 {{- end -}}
-```
-
-#### Required values
-
-The following values need to be set in the parent chart's `values.yaml` in addition to the globally required values [listed above](#all-template-required-values):
-
-```
-secret:
-  name: <string>
-  type: <string>
 ```
 
 ### Service template
@@ -257,7 +215,7 @@ A generic K8s `Service` object requiring a service type to be set.
 
 A basic usage of this object template would involve the creation of `templates/secret.yaml` in the parent Helm chart (e.g. `microservice`) containing:
 
-```
+```yaml
 {{- include "helm-library.service" (list . "microservice.service") -}}
 {{- define "microservice.service" -}}
 # Microservice specific configuration in here
@@ -266,9 +224,9 @@ A basic usage of this object template would involve the creation of `templates/s
 
 #### Required values
 
-The following values need to be set in the parent chart's `values.yaml` in addition to the globally required values [listed above](#all-template-required-values):
+The following values need to be set in the parent chart's `values.yaml`:
 
-```
+```yaml
 service:
   type: <string>
 ```
@@ -282,23 +240,18 @@ A k8s `CronJob`.
 
 A basic usage of this object template would involve the creation of `templates/cron-job.yaml` in the parent Helm chart (e.g. `microservice`) that includes the template defined in `_container.yaml` template:
 
-```
+```yaml
 {{- include "helm-library.cron-job" (list . "microservice.cron-job") -}}
 {{- define "microservice.cron-job" -}}
-spec:
-  template:
-    spec:
-      containers:
-      - {{ include "helm-library.container" (list . "microservice.container") }}
 {{- end -}}
 
 ```
 
 #### Required values
 
-The following values need to be set in the parent chart's `values.yaml` in addition to the globally required values [listed above](#all-template-required-values):
+The following values need to be set in the parent chart's `values.yaml`:
 
-```
+```yaml
 cronJob:
   schedule: <string>
   concurrencyPolicy: <string>
@@ -313,7 +266,7 @@ A k8s `HorizontalPodAutoscaler`.
 
 A basic usage of this object template would involve the creation of `templates/horizontal-pod-autoscaler.yaml` in the parent Helm chart (e.g. `microservice`).
 
-```
+```yaml
 {{- include "helm-library.horizontal-pod-autoscaler" (list . "microservice.horizontal-pod-autoscaler") -}}
 {{- define "microservice.horizontal-pod-autoscaler" -}}
 spec:
@@ -336,10 +289,10 @@ spec:
 
 #### Required values
 
-The following values need to be set in the parent chart's `values.yaml` in addition to the globally required values [listed above](#all-template-required-values):
+The following values need to be set in the parent chart's `values.yaml`:
 
-```
-cronJob:
+```yaml
+deployment:
   minReplicas: <int>
   maxReplicas: <int>
 ```
@@ -360,14 +313,14 @@ A template defining the default message to print when checking for a required va
 * Template name: `helm-library.labels`
 * Usage: `{{- include "helm-library.labels" . }}`
 
-Common labels to apply to `metadata` of all K8s objects on the K8s platform. This template relies on the globally required values [listed above](#all-template-required-values).
+Common labels to apply to `metadata` of all K8s objects on the K8s platform..
 
 ### Selector labels
 
 * Template name: `helm-library.selector-labels`
 * Usage: `{{- include "helm-library.selector-labels" . }}`
 
-Common selector labels that can be applied where necessary to K8s objects on the K8s platform. This template relies on the globally required values [listed above](#all-template-required-values).
+Common selector labels that can be applied where necessary to K8s objects on the K8s platform.
 
 ### Http GET probe
 
@@ -376,7 +329,7 @@ Common selector labels that can be applied where necessary to K8s objects on the
 
 Template for configuration of an http GET probe, which can be used for `readinessProbe` and/or `livenessProbe` in a container definition within a `Deployment` (see [container template](#container-template)). The following values need to be passed to the probe in the `<map_of_probe_values>`:
 
-```
+```yaml
 path: <string>
 port: <integer>
 initialDelaySeconds: <integer>
@@ -391,7 +344,7 @@ failureThreshold: <integer>
 
 Template for configuration of an "exec" probe that runs a local script, which can be used for `readinessProbe` and/or `livenessProbe` in a container definition within a `Deployment` (see [container template](#container-template)). The following values need to be passed to the probe in the `<map_of_probe_values>`:
 
-```
+```yaml
 script: <string>
 initialDelaySeconds: <integer>
 periodSeconds: <integer>
@@ -407,7 +360,7 @@ A K8s `AzureIdentity` object. Must be used in conjunction with the `AzureIdentit
 
 A basic usage of this object template would involve the creation of `templates/azure-identity.yaml` in the parent Helm chart (e.g. `microservice`) containing:
 
-```
+```yaml
 {{- include "helm-library.azure-identity" (list . "microservice.azure-identity") -}}
 {{- define "microservice.azure-identity" -}}
 {{- end -}}
@@ -415,9 +368,9 @@ A basic usage of this object template would involve the creation of `templates/a
 
 #### Required values
 
-The following values need to be set in the parent chart's `values.yaml` in addition to the globally required values [listed above](#all-template-required-values):
+The following values need to be set in the parent chart's `values.yaml`:
 
-```
+```yaml
 azureIdentity:
   resourceID:
   clientID:
@@ -432,15 +385,11 @@ A K8s `AzureIdentityBinding` object. Must be used in conjunction with the `Azure
 
 A basic usage of this object template would involve the creation of `templates/azure-identity-binding.yaml` in the parent Helm chart (e.g. `microservice`) containing:
 
-```
+```yaml
 {{- include "helm-library.azure-identity-binding" (list . "microservice.azure-identity-binding") -}}
 {{- define "microservice.azure-identity-binding" -}}
 {{- end -}}
 ```
-
-#### Required values
-
-Only the globally required values [listed above](#all-template-required-values).
 
 ### Infiscal secret
 
@@ -451,12 +400,8 @@ A K8s `InfiscalSecret` object.
 
 A basic usage of this object template would involve the creation of `templates/azure-identity-binding.yaml` in the parent Helm chart (e.g. `microservice`) containing:
 
-```
+```yaml
 {{- include "helm-library.infiscal-secret" (list . "microservice.infiscal-secret") -}}
 {{- define "microservice.infiscal-secret" -}}
 {{- end -}}
 ```
-
-#### Required values
-
-Only the globally required values [listed above](#all-template-required-values).

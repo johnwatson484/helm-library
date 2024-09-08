@@ -3,7 +3,7 @@
 apiVersion: "aadpodidentity.k8s.io/v1"
 kind: AzureIdentity
 metadata:
-  name: {{ required (printf $requiredMsg "name") .Values.name }}-identity
+  name: {{ .Chart.Name }}-identity
   labels: {{- include "helm-library.labels" . | nindent 4 }}
   annotations:
     aadpodidentity.k8s.io/Behavior: namespaced

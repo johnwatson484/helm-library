@@ -3,12 +3,12 @@
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: {{ required (printf $requiredMsg "name") .Values.name | quote }}
+  name: {{ .Chart.Name | quote }}
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: {{ required (printf $requiredMsg "name") .Values.name | quote }}
+    name: {{ .Chart.Name | quote }}
   minReplicas: {{ required (printf $requiredMsg "minReplicas") .Values.deployment.minReplicas }}
   maxReplicas: {{ required (printf $requiredMsg "maxReplicas") .Values.deployment.maxReplicas }}
 {{- end }}

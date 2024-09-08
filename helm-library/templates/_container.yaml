@@ -1,7 +1,16 @@
 {{- define "helm-library.container.tpl" -}}
 {{- $requiredMsg := include "helm-library.default-check-required-msg" . -}}
-name: {{ required (printf $requiredMsg "name") .Values.name | quote }}
-image: {{ required (printf $requiredMsg "image") .Values.image | quote }}
+name: {{ .Chart.Name | quote }}
+image: {{ .Chart.Name | quote }}
+envFrom:
+{{- if .Values.configMap }}
+- configMapRef:
+    name: {{ .Chart.Name }}
+{{- end }}
+{{- if .Values.secret }}
+- secretRef:
+    name: {{ .Chart.Name }}
+{{- end }}
 {{- if .Values.container.command }}
 command:
   {{- toYaml .Values.container.command | nindent 12 }}
@@ -49,6 +58,12 @@ resources:
     cpu: {{ .Values.container.limitCpu | quote }}
     {{- end }}
   {{- end }}
+{{- if .Values.container.port }}
+ports:
+- containerPort: {{ .Values.container.port }}
+  name: http
+  protocol: TCP
+{{- end }}
 volumeMounts:
 - mountPath: /tmp
   name: temp-dir

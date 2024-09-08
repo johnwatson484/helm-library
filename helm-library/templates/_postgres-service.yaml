@@ -3,15 +3,15 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ required (printf $requiredMsg "postgresService.postgresHost") .Values.postgresService.postgresHost | quote }}
+  name: {{ required (printf $requiredMsg "postgres.host") .Values.postgres.host | quote }}
   labels:
     {{- include "helm-library.labels" . | nindent 4 }}
 spec:
   type: ExternalName
-  externalName: {{ required (printf $requiredMsg "postgresService.postgresExternalName") .Values.postgresService.postgresExternalName | quote }}
+  externalName: {{ required (printf $requiredMsg "postgres.externalName") .Values.postgres.externalName | quote }}
   ports:
     - name: port
-      port: {{ required (printf $requiredMsg "postgresService.postgresPort") .Values.postgresService.postgresPort }}
+      port: {{ required (printf $requiredMsg "postgres.port") .Values.postgres.port }}
 {{- end -}}
 {{- define "helm-library.postgres-service" -}}
 {{- include "helm-library.util.merge" (append . "helm-library.postgres-service.tpl") -}}

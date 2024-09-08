@@ -1,9 +1,8 @@
 {{- define "helm-library.configmap.tpl" -}}
-{{- $requiredMsg := include "helm-library.default-check-required-msg" . -}}
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ required (printf $requiredMsg "configmap.name") .Values.name | quote }}
+  name: {{ .Chart.Name | quote }}
   labels:
     {{- include "helm-library.labels" . | nindent 4 }}
 data: {}
