@@ -67,6 +67,18 @@ ports:
 volumeMounts:
 - mountPath: /tmp
   name: temp-dir
+{{- if .Values.startupProbe }}
+startupProbe:
+  {{- toYaml .Values.startupProbe | nindent 2 }}
+{{- end }}
+{{- if .Values.readinessProbe }}
+readinessProbe:
+  {{- toYaml .Values.livenessProbe | nindent 2 }}
+{{- end }}
+{{- if .Values.livenessProbe }}
+livenessProbe:
+  {{- toYaml .Values.livenessProbe | nindent 2 }}
+{{- end }}
 {{- end -}}
 {{- define "helm-library.container" -}}
 {{- println "" -}}
