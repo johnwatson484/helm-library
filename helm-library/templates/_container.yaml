@@ -24,6 +24,7 @@ securityContext:
   readOnlyRootFilesystem: {{ .Values.container.readOnlyRootFilesystem | default true }}
   allowPrivilegeEscalation: {{ .Values.container.allowPrivilegeEscalation | default false }}
 resources:
+  {{- if .Values.container.resourceTier }}
   {{- if eq .Values.container.resourceTier "S" }}
   requests:
     memory: "100Mi"
@@ -48,6 +49,13 @@ resources:
     cpu: "1"
   limits:
     memory: "1Gi"
+  {{- else }}
+  requests:
+    memory: "250Mi"
+    cpu: "250m"
+  limits:
+    memory: "250Mi"
+  {{- end }}
   {{- else }}
   requests:
     memory: {{ required (printf $requiredMsg "container.requestMemory") .Values.container.requestMemory | quote }}
