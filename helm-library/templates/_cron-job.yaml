@@ -22,7 +22,7 @@ spec:
           - name: temp-dir
             emptyDir: {}
           containers:
-          {{- if and (.Values.container) (not .Values.container.skipDefault) }}
+          {{- if .Values.container }}
           - {{ include "helm-library.container" (list . (printf "%s.container" .Chart.Name )) }}
           {{- else }}
           -
