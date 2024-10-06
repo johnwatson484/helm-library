@@ -9,6 +9,7 @@ metadata:
 spec:
   schedule: {{ required (printf $requiredMsg "cronJob.schedule") .Values.cronJob.schedule | quote }}
   concurrencyPolicy: {{ required (printf $requiredMsg "cronJob.concurrencyPolicy") .Values.cronJob.concurrencyPolicy | quote }}
+  successfulJobsHistoryLimit: {{ .Values.cronJob.successfulJobsHistoryLimit | default 1 }}
   jobTemplate: 
     spec:
       template:
@@ -23,7 +24,7 @@ spec:
             emptyDir: {}
           containers:
           {{- if and (.Values.container) (not .Values.container.skipDefault) }}
-          - {{ include "helm-library.container" (list . (printf "%s.container" .Chart.Name )) }}
+          - {{ include "helm-library.container" (list . (printf "%s.container" .Chart.Name )) | nindent 4 }}
           {{- else }}
           -
           {{- end }}
