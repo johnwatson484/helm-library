@@ -25,7 +25,9 @@ spec:
   tls:
   - hosts:
     - {{ .Values.ingress.host }}
+    {{- if .Values.ingress.useWww }}
     - www.{{ .Values.ingress.host }}
+    {{- end }}
     secretName: {{ .Chart.Name }}-tls
   {{- end }}
   rules:
@@ -43,7 +45,7 @@ spec:
             name: {{ .Chart.Name | quote }}
             port:
               number: 80
-{{- if .Values.ingress.host }}
+{{- if and .Values.ingress.host .Values.ingress.useWww }}
   - host: www.{{ .Values.ingress.host }}
     http:
       paths:
