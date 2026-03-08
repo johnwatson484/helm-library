@@ -52,6 +52,14 @@ steps:
       chmod 700 ~/.ssh && chmod 600 ~/.ssh/id_rsa
       ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
     displayName: Install SSH key
+
+  - script: |
+      ssh-keygen -l -f ~/.ssh/id_rsa
+    displayName: Check SSH key type
+
+  - script: |
+      ssh -vT git@github.com
+    displayName: Test SSH connection
   
   - script: |
       cd $(Agent.BuildDirectory)/s/$(helmRepo)
