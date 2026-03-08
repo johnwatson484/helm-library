@@ -48,9 +48,14 @@ steps:
       secureFile: 'GitHub-Helm-Deploy-Key'
 
   - script: |
-      mkdir ~/.ssh && mv $(sshKey.secureFilePath) ~/.ssh/id_rsa
-      chmod 700 ~/.ssh && chmod 600 ~/.ssh/id_rsa
+      mkdir -p ~/.ssh
+      cp $(sshKey.secureFilePath) ~/.ssh/id_rsa
+      chmod 700 ~/.ssh
+      chmod 600 ~/.ssh/id_rsa
       ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
+      # Verify the key file
+      file ~/.ssh/id_rsa
+      ls -la ~/.ssh/id_rsa
     displayName: Install SSH key
 
   - script: |
@@ -58,7 +63,7 @@ steps:
     displayName: Check SSH key type
 
   - script: |
-      ssh -vT git@github.com
+      ssh -vT git@github.com 2>&1 || true
     displayName: Test SSH connection
   
   - script: |
